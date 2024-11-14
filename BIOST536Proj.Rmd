@@ -1,0 +1,63 @@
+---
+title: "Data Analysis Project"
+author: "BIOST 536"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+
+options(digits = 3) ## Formats output to 3 digits
+library(lmtest)
+library(tidyverse)
+library(kableExtra)
+load("tbdata.Rdata")
+tbdata = tibble(tbdata)
+```
+
+In order to make the household density variable that we are interested in in order to perform a grouped linear adjustment with ordinal variables, we must mutate our data by dividing family size by number of rooms.
+
+```{r}
+tbdata = tbdata %>% mutate(famSize = case_when(
+  famSize == "<4" ~ 1,
+  famSize == "4-6" ~ 2,
+  famSize == ">6" ~ 3
+))
+
+
+tbdata = tbdata %>% mutate(roomNo = case_when(
+  roomNo == "1" ~ 1,
+  roomNo == "2" ~ 2,
+  roomNo == "3+" ~ 3
+))
+
+tbdata = tbdata %>% mutate(householdDensity = (famSize / roomNo))
+```
+
+Now, we can fit a logistic regression model to estimate the risk of TB infection associated with the number of windows in a household, adjusting for sex and our household density variable.
+
+```{r}
+tb_mod_glm = glm(case ~ windowNo + male + householdDensity,
+                 family=binomial, 
+                 data=tbdata)
+
+summary(tb_mod_glm)
+
+tb_mod_glm_null = glm(case ~ male + householdDensity,
+                      family=binomial,
+                      data=tbdata)
+```
+
+In this case, the model estimates that the odds of TB infection for a subpopulation of individuals with 1 window in their house, with the same sex and household density, is `r exp(coef(tb_mod_glm))["windowNo1"]` times the odds of TB infection for a subpopulation of individuals without windows in their house with a 95% CI using model based SEs of [`r exp(confint(tb_mod_glm)["windowNo1", "2.5 %"])`, `r exp(confint(tb_mod_glm)["windowNo1", "97.5 %"])`].
+
+Comparing individuals with 2-3 windows vs no windows, the OR is now `r exp(coef(tb_mod_glm))["windowNo2-3"]` with a 95% CI using model based SEs of [`r exp(confint(tb_mod_glm)["windowNo2-3", "2.5 %"])`, `r exp(confint(tb_mod_glm)["windowNo2-3", "97.5 %"])`].
+
+Comparing individuals with 4 or more windows vs no windows, the OR is now `r exp(coef(tb_mod_glm))["windowNo4+"]` with a 95% CI using model based SEs of [`r exp(confint(tb_mod_glm)["windowNo4+", "2.5 %"])`, `r exp(confint(tb_mod_glm)["windowNo4+", "97.5 %"])`].
+
+Since we have full and null models at this point, we can also run an LRtest in order to assess the significance of the number of windows in a house being a risk factor for TB infection. We'll use the significance level $\alpha = 0.05$
+
+```{r}
+lrtest(tb_mod_glm, tb_mod_glm_null)
+```
+
+At the aforementioned significance level, we can reject the null hypothesis that the number of windows in a house does not have an effect on the risk of TB infection for this population of individuals.
