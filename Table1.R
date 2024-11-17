@@ -7,7 +7,7 @@ library(gt)
 library(gtable)
 library(gtsummary)
 
-setwd('/Users/calenmendall/Desktop/UW_school_projects/Biost536/Extended_abstract/')
+setwd('/Users/calenmendall/Desktop/UW_school_projects/Biost536/BIOST536_Extended_abstract/')
 load(file = 'tbdata.RData')
 
 ## Add in household density measure
@@ -68,3 +68,4 @@ tab2 = tab %>% tab_options(table.font.size = 10, heading.title.font.size = 11,
 ## Saving the table
 
 gtsave(tab2, filename = "table1.pdf", path = "./")
+gtExtras::gtsave_extra(tab2, filename = "table1.2.png",path = "./")
