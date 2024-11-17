@@ -1,9 +1,33 @@
 
 #### Extended abstract ####
+
+# Set environment and load data
+library(tidyverse, warn.conflicts = F)
+library(gt)
+library(gtable)
+library(gtsummary)
+
 setwd('/Users/calenmendall/Desktop/UW_school_projects/Biost536/Extended_abstract/')
 load(file = 'tbdata.RData')
 
+## Add in household density measure
+tbdata = tbdata %>% mutate(famSize = case_when(
+  famSize == "<4" ~ 1,
+  famSize == "4-6" ~ 2,
+  famSize == ">6" ~ 3
+))
 
+
+tbdata = tbdata %>% mutate(roomNo = case_when(
+  roomNo == "1" ~ 1,
+  roomNo == "2" ~ 2,
+  roomNo == "3+" ~ 3
+))
+
+tbdata = tbdata %>% mutate(householdDensity = round((famSize / roomNo),2))
+
+
+## Select relevant subset of data to table
 tbdata_sub = tbdata %>% select(
   'Case'= case,
   "Sex" = male,
@@ -11,14 +35,16 @@ tbdata_sub = tbdata %>% select(
   "Income" = income,
   "Family Size" = famSize, 
   "Number of Rooms" = roomNo,
-  'Number of Windows' = windowNo
+  'Number of Windows' = windowNo,
+  'Household density' = householdDensity
 )
 
 
 tbdata_sub$Sex = factor(tbdata_sub$Sex, labels = c('Female', 'Male'))
 tbdata_sub$Case = factor(tbdata_sub$Case, labels = c('Control', 'Case'))
-tbdata_sub$Income = factor(tbdata_sub$Income, labels= c('High', 'Mid', 'Low'), levels = c('high','mid','low'))
-tbdata_sub$`Family Size` = factor(tbdata_sub$`Family Size`, labels= c('>6', '4-6', '<4'), levels = c('>6', '4-6', '<4'))
+tbdata_sub$Income = factor(tbdata_sub$Income, labels= c('Low', 'Mid', 'High'), levels = c('low','mid','high'))
+tbdata_sub$`Number of Rooms` = factor(tbdata_sub$`Number of Rooms`, labels= c('1', '2', '3+'), levels = c(1, 2, 3))
+tbdata_sub$`Family Size` = factor(tbdata_sub$`Family Size`, labels= c('<4', '4-6', '>6'), levels = c(1, 2, 3))
 
 
 

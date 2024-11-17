@@ -1,0 +1,68 @@
+---
+title: ""
+format: pdf
+---
+
+```{mermaid}
+%%| fig-width: 6.5
+flowchart LR
+  A{Number of \nwindows\nin home} --> B{Tuberculosis\ninfection}
+  C(Sex) --> B
+  A --> D(Household members \nwith tuberculosis)
+  D -->B
+  H(BCG\nvaccination) --> B
+  I(Smoking) --> B
+  E(Household density) --> B
+  E --> A
+  F(Income)--> E
+  G(Age) --> F
+  C -->F
+  G --> B
+  F --> A
+  
+```
+
+
+```{r dag2, echo=F, message=F, warning=F, error=F, results='hide'}
+
+require(dagitty)
+require(ggdag)
+require(ggplot2)
+
+g1 <- dagitty( 'dag {
+   "Number of windows in home" [pos="0,0.6"]
+   "Tuberculosis infection" [pos="0.9,0.6"]
+   "Sex" [pos="0.25,0.52"]
+   "?" [pos="0.51,0.605"]
+   "Household members with tuberculosis" [pos="0.5,0.63"]
+   "BCG vaccination" [pos="1.08,0.55"]
+   "Smoking" [pos="0.87,0.53"]
+   "Household density" [pos="0.45,0.575"]
+   "Income" [pos="0.25,0.55"]
+   "Age" [pos="0.4,0.51"]
+   "Number of windows in home" -> "Tuberculosis infection"
+   "Household density" -> "Number of windows in home"
+   "Sex" -> "Tuberculosis infection"
+   "Number of windows in home" -> "Household members with tuberculosis"
+   "Household members with tuberculosis" -> "Tuberculosis infection"
+   "BCG vaccination" -> "Tuberculosis infection"
+   "Smoking" -> "Tuberculosis infection"
+   "Household density" -> "Tuberculosis infection"
+   "Income" -> "Household density"
+   "Age" -> "Income"
+   "Sex" -> "Income"
+   "Age" -> "Tuberculosis infection"
+   "Income" -> "Number of windows in home"
+}')
+
+tmp = tidy_dagitty(g1) #7,17,1113,1610, 502, 508
+
+ggdag_classic(tmp,  size = 4)+
+  theme_dag_blank()+
+  xlim(c(-0.4,1.2))+
+  
+  theme(plot.margin = unit(c(-0.5,-0.5,-0.5,-0.5), "cm"))
+```
+
+
+
