@@ -56,15 +56,16 @@ tab = tbl_summary(tbdata_sub, by = 'Case') %>% add_overall(last=T)%>% as_gt()
 tab = tab %>% tab_spanner('Tuberculosis infection status', columns = c(6,7,8), gather = T, level = 1) %>%
   tab_header("Table 1. Descriptive statistics of study participants. Categorical variables are summarized by counts and percentages. Continuous and discrete variables are summarized by their median and interquartile range.") 
 
-tab2 = tab %>% tab_options(table.font.size = 10, heading.title.font.size = 11,
+tab2 = tab %>% tab_options(table.font.size = 14, heading.title.font.size = 15,
                     row_group.font.weight = 'bold', 
                     column_labels.font.weight = 'bold', 
                     row_group.background.color = "gray95", 
                     column_labels.background.color = 'gray80', stub.border.width = 0, 
-                    data_row.padding.horizontal = 0)
+                    data_row.padding.horizontal = 0,
+                    data_row.padding = 2)
 
-
-
+tab2 = tab2 %>% cols_width(everything()~185)
+tab2
 ## Saving the table
 
 gtsave(tab2, filename = "table1.pdf", path = "./")
