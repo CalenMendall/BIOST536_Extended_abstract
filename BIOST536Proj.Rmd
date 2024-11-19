@@ -37,13 +37,13 @@ tbdata = tbdata %>% mutate(householdDensity = (famSize / roomNo))
 Now, we can fit a logistic regression model to estimate the risk of TB infection associated with the number of windows in a household, adjusting for sex and our household density variable.
 
 ```{r}
-tb_mod_glm = glm(case ~ windowNo + male + householdDensity,
+tb_mod_glm = glm(case ~ windowNo + male + householdDensity + income,
                  family=binomial, 
                  data=tbdata)
 
 summary(tb_mod_glm)
 
-tb_mod_glm_null = glm(case ~ male + householdDensity,
+tb_mod_glm_null = glm(case ~ male + householdDensity + income,
                       family=binomial,
                       data=tbdata)
 ```
