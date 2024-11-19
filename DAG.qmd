@@ -23,7 +23,7 @@ flowchart LR
 ```
 
 
-```{r dag2, echo=F, message=F, warning=F, error=F, results='hide'}
+```{r dag2, echo=F, message=F, warning=F, error=F, results='hide', eval=F}
 
 require(dagitty)
 require(ggdag)
@@ -54,6 +54,15 @@ g1 <- dagitty( 'dag {
    "Age" -> "Tuberculosis infection"
    "Income" -> "Number of windows in home"
 }')
+
+adjustmentSets(
+    g1,
+    exposure = "Number of windows in home",
+    outcome = "Tuberculosis infection",
+    type = "minimal",
+    effect = "total",
+    max.results = Inf
+)
 
 tmp = tidy_dagitty(g1) #7,17,1113,1610, 502, 508
 

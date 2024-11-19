@@ -2,6 +2,7 @@
 #### Extended abstract ####
 
 # Set environment and load data
+rm(list=ls())
 library(tidyverse, warn.conflicts = F)
 library(gt)
 library(gtable)
