@@ -15,9 +15,8 @@ load("tbdata.Rdata")
 tbdata = tibble(tbdata)
 ```
 
-In order to make the household density variable that we are interested in in order to perform a grouped linear adjustment with ordinal variables, we must mutate our data by dividing family size by number of rooms.
-
 ```{r}
+# mutate data to perform grouped linear adjustment with ordinal variables
 tbdata = tbdata %>% mutate(famSize = case_when(
   famSize == "<4" ~ 1,
   famSize == "4-6" ~ 2,
@@ -31,12 +30,10 @@ tbdata = tbdata %>% mutate(roomNo = case_when(
   roomNo == "3+" ~ 3
 ))
 
+# divide ordinal familySize by roomNo to create crude householdDensity covariate
 tbdata = tbdata %>% mutate(householdDensity = (famSize / roomNo))
-```
 
-Now, we can fit a logistic regression model to estimate the risk of TB infection associated with the number of windows in a household, adjusting for sex and our household density variable.
-
-```{r}
+# fit logreg model to estimate risk of TB associated with windows, adjusting for sex, household density, and income
 tb_mod_glm = glm(case ~ windowNo + male + householdDensity + income,
                  family=binomial, 
                  data=tbdata)
@@ -57,6 +54,7 @@ Comparing individuals with 4 or more windows vs no windows, the OR is now `r exp
 Since we have full and null models at this point, we can also run an LRtest in order to assess the significance of the number of windows in a house being a risk factor for TB infection. We'll use the significance level $\alpha = 0.05$
 
 ```{r}
+# perform LR test on full and null models to assess significance of numWindows
 lrtest(tb_mod_glm, tb_mod_glm_null)
 ```
 
